@@ -37,7 +37,7 @@
 
 ## Упражнение. Исследуем Layout Inspector
 
-Поработав с Layout Inspector я разобрался, как можно отлаживать UI и находить наложение друг на друга.
+Поработав с Layout Inspector, я разобрался, как можно отлаживать UI и находить наложение друг на друга.
 <p align = "center">
     <img src = "images/1-1.png">
     <br>
@@ -47,6 +47,22 @@
 </p>
 
 ## Упражнение. Profiler 
+Работа с Profiler, можно узнать как как ведет себя система во время работы приложения. 
+Отслеживать сретические моменты, когда приложение может подвисать и узнать из-за чего это происходит.
+
+<p align = "center">
+    <img src = "images/2-1.png">
+    <br>
+    <img src = "images/2-2.png">
+    <br>
+    <img src = "images/2-3.png">
+    <br>
+    <img src = "images/2-4.png">
+    <br>
+    <img src = "images/2-5.png">
+    <br>
+    <img src = "images/2-6.png">
+</p>
 
 ***
 
