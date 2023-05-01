@@ -18,171 +18,38 @@
 - [Цели и задачи](#цели-и-задачи)
 - [Решение задач](#решение-задач)
     - [Упражнение. Исследуем Layout Inspector](#layout_inspector)
-    - [Оценка ответов](#response_score)
+    - [Упражнение. Profiler](#profiler)
 - [Вывод](#вывод)
 
 ***
 
 # <p align = "center">Цели и задачи</p>
 
-1.  Предотвращение ввода нескольких ответов.
-После того как пользователь введет ответ на вопрос, заблокируйте кнопки этого вопроса, чтобы предотвратить возможность ввода нескольких ответов. 
+1.  Упражнение. Исследуем Layout Inspector
+Для диагностики проблем с файлами макетов и интерактивного анализа визуализации макета на экране можно воспользоваться инструментом Layout Inspector. Убедитесь в том, что GeoQuiz выполняется в эмуляторе, и нажмите кнопку Layout Inspector на левой панели окна Android Monitor. Далее вы сможете исследовать свойства своего макета, щелкая на элементах в представлении Layout Inspector. 
  
-2.	Вывод оценки.пки возврата
-После того как пользователь введет ответ на все вопросы, отобразите уведомление с процентом правильных ответов. 
+2.	Упражнение. Profiler 
+С помощью инструмента Profiler создаются подробные отчеты о том, как ваше приложение использует ресурсы Android-устройства, а именно процессор и память. Это полезно при оценке и настройке производительности вашего приложения. Для просмотра окна Profiler запустите приложение на подключенном Android устройстве или эмуляторе, в строке меню выберите команду View ⇒ Tool Windows ⇒ Profiler. В открывшемся окне Profiler отобразится временная шкала с показаниями по использованию сети, процессора, памяти и заряда аккумулятора. Щелкните по разделу, чтобы увидеть более подробную информацию об использовании этого ресурса вашим приложением. В режиме просмотра процессора нажмите кнопку Record, чтобы получить более подробную информацию об использовании процессора. После выполнения любых взаимодействий с приложением, которые вы хотите записать, нажмите кнопку Stop, чтобы остановить запись.
 
 ***
 
 # <p align = "center">Решение задач</p>
 
-## Запись ответов
+## Упражнение. Исследуем Layout Inspector
 
-Первым делом я модернезировал класс `Question` для того, чтобы хранить ответ пользователя. По умолчанию ответ будет пустым:
-
-```kotlin
-    data class Question(@StringRes val textResId: Int, val answer : Boolean) {
-+++     var isAnswered: Boolean? = null;
-    }
-```
-
-Далее в `MainActivity` при ответе пользователся я сохраняю его ответ и вызываю метод для блокировки кнопок:
-
-```kotlin
-//Метод для обработки действий при нажатии на кнопку
-private fun trueButton(){
-    if(questionBank[currentindex].answer)
-        showToast(R.string.currect_toast);
-    else
-        showToast(R.string.incurrect_toast);
-
-    //Записать ответ пользователя
-    writeAnswer(true);
-    //Перейти к ледующему вопросу
-    nextQuestion();
-}
-
-private fun nextQuestion(){
-    currentindex++;
-    if(currentindex == questionBank.size) currentindex = questionBank.size - 1;
-
-    val questionTextResId = questionBank[currentindex].textResId;
-    questionTextView.setText(questionTextResId);
-
-    //Обновить состояние кнопок в зависимости, ответили ли мы на текущий вопрос или нет
-    checkAndLockButtons();
-}
-
-private fun writeAnswer(answer : Boolean){
-    //Записываем ответ
-    questionBank[currentindex].isAnswered = answer;
-}
-
-private fun checkAndLockButtons(){
-    //Проверяем ответили ли мы
-    if (questionBank[currentindex].isAnswered != null){
-        //Блокеируем кнопки
-        true_button.isClickable = false;
-        false_button.isClickable = false;
-
-        true_button.isEnabled = false;
-        false_button.isEnabled = false;
-    }
-    else{
-        //Разблокируем кнопки
-        true_button.isClickable = true;
-        false_button.isClickable = true;
-
-        true_button.isEnabled = true;
-        false_button.isEnabled = true;
-    }
-}
-```
-
-## Оценка ответов
-
-Модернезируем методы при нажатии кнопок и добавим проверку на то, что мы ответили на все вопросы. 
-Затем мы выведем длинный Toast с дробью и процентами привильных ответов
-
-```kotlin
-//Проверка, что на все вопросы был дан ответ
-private fun isAllAnswered() : Boolean {
-    for(quest in questionBank){
-        if(quest.isAnswered == null) return false;
-    }
-    return true;
-}
-
-//Подсчет количества верноотвеченных вопросов
-private fun countTrueAnswered() : Int {
-    var count : Int = 0;
-    for(quest in questionBank){
-        if(quest.isAnswered == quest.answer) count++;
-    }
-    return count;
-}
-
-//Комбиноирование провреки, подсчета и вывод результата
-private fun checkAndShowAnswered(){
-    if(isAllAnswered()) {
-        var count : Int = countTrueAnswered();
-        var max : Int = questionBank.size;
-        var procent: Double = ((count.toDouble() / max) * 10000).roundToInt() / 100.0;
-        
-        showToast("Вы ответили верно: " + count + "/" + max + "  -  " + procent + "%")
-    }
-}
-```
-
-Для работы всей системы вызывается только метод `checkAndShowAnswered()`.
-Вызывается он при смене ответе на вопрос, а каждый ответ вызывается в свою очередь метод `nextQuestion()`. Туда я и поместил вызов `checkAndShowAnswered()`.
-
-```kotlin
-private fun nextQuestion(){
-    currentindex++;
-    if(currentindex == questionBank.size) currentindex = questionBank.size - 1;
-
-    val questionTextResId = questionBank[currentindex].textResId;
-    questionTextView.setText(questionTextResId);
-
-    checkAndLockButtons();
-    checkAndShowAnswered();
-}
-```
-
-Так же перегрузил метод для вывода `Toast`:
-
-```kotlin
-//Старый
-private fun showToast(text: Int){
-    toast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
-    toast.show();
-}
-
-//Добавленный
-private fun showToast(text: String){
-    toast = Toast.makeText(this, text, Toast.LENGTH_LONG);
-    toast.show();
-}
-```
-
-### Итоги работы
-
-<p align = "center">Так выглядят кнопки на вопросе, на который уже был дан ответ:</p>
-
+Поработав с Layout Inspector я разобрался, как можно отлаживать UI и находить наложение друг на друга.
 <p align = "center">
-<img src = "img/3.1.png">
+    <img src = "images/1-1.png">
+    <br>
+    <img src = "images/1-2.png">
+    <br>
+    <img src = "images/1-3.png">
 </p>
 
-<p align = "center">А так выглядит всплывающий `Toast`, когда на все вопросы был дан ответ:</p>
-
-<p align = "center">
-<img src = "img/3.2.png">
-<br>
-<img src = "img/3.3.png">
-</p>
+## Упражнение. Profiler 
 
 ***
 
 # <p align = "center">Вывод</p>
 
-Выполнив *лабораторную работу №3*, совершенствую навыки работы с языком `Kotlin` и проектированием MVC архетиктуры приложения. 
+Выполнив *лабораторную работу №4*, совершенствую навыки работы со средой разработки `Android Studion` и работы с языком `Kotlin`. 
