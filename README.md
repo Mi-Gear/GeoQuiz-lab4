@@ -58,7 +58,6 @@
     <img src = "images/2-3.png">
     <br>
     <img src = "images/2-4.png">
-    <br>
     <img src = "images/2-5.png">
     <br>
     <img src = "images/2-6.png">
